@@ -1,0 +1,29 @@
+services:
+  vault:
+    privileged: true
+    image: "hashicorp/vault:latest"
+    restart: unless-stopped
+    container_name: vault
+    ports:
+    - "8201:8201"
+    - "8200:8200"
+    environment:
+      VAULT_API_ADDR: "https://vault.test.lan"
+      VAULT_CACERT: /vault/userconfig/tls/ca.crt
+    cap_add:
+    - IPC_LOCK
+    volumes:
+    - ./vault_data/audit:/vault/audit
+    - ./vault_data/config:/vault/config
+    - ./vault_data/data:/vault/data
+    - ./vault_data/file:/vault/file
+    - ./vault_data/logs:/vault/logs
+    - ./vault_data/userconfig:/vault/userconfig
+    - ./vault_data/plugins:/vault/plugins
+    command: vault server -config=/vault/config/vault-config.hcl
+    networks:
+    - services_net
+
+networks:
+  services_net:
+    driver: bridge
